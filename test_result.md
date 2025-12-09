@@ -48,6 +48,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "COMPREHENSIVE E2E TESTING COMPLETED: All three login roles (Manager: manager@imtiaz.com/manager123, Admin: admin@imtiaz.com/admin123, Client: client@example.com/client123) are working perfectly. API calls return 200 status, JWT tokens stored correctly, dashboards load successfully. No console errors detected. User issue is NOT REPRODUCIBLE in current system - likely user environment/cache issue."
+      - working: true
+        agent: "testing"
+        comment: "ERR_CONNECTION_REFUSED FIX VERIFIED: Added missing Vite proxy configuration to forward /api/* requests from frontend (port 3000) to backend (port 8001). All login flows now working correctly with relative URLs. API calls successful (200 OK), no localhost:8001 references, dashboards loading properly. Fix confirmed working in preview environment."
 
 metadata:
   created_by: "main_agent"
