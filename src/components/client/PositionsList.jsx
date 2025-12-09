@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { X } from 'lucide-react';
 
 /**
  * Positions List Component
  * Displays open trading positions
+ * Optimized with React.memo and useMemo
  */
-export function PositionsList({ positions, onClosePosition }) {
+export const PositionsList = React.memo(function PositionsList({ positions, onClosePosition }) {
   if (!positions || positions.length === 0) {
     return (
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
