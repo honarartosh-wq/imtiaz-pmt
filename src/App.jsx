@@ -30,44 +30,88 @@ const ImtiazTradingPlatform = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  // Mock branch data (would be fetched from backend in production)
-  const mockBranches = {
-    'branch_001': { id: 'branch_001', name: 'Main Branch', code: 'MAIN-001', logo: '' },
-    'branch_002': { id: 'branch_002', name: 'Downtown Branch', code: 'DT-002', logo: '' }
-  };
+  // State for loading and errors
+  const [isLoading, setIsLoading] = useState(false);
+  const [registerError, setRegisterError] = useState('');
 
-  // WARNING: Demo credentials for testing only - NEVER store credentials in frontend code in production
-  // In production, use proper authentication with backend API and secure password handling
-  const mockUsers = {
-    'manager@imtiaz.com': { password: 'manager123', type: 'manager', id: 'mgr_001', name: 'John Manager', email: 'manager@imtiaz.com' },
-    'admin@imtiaz.com': { password: 'admin123', type: 'admin', id: 'admin_001', name: 'Sarah Admin', email: 'admin@imtiaz.com', branchId: 'branch_001', branchName: 'Main Branch', branchCode: 'MAIN-001', referralCode: 'MAIN001-REF' },
-    'client@example.com': { password: 'client123', type: 'client', id: 'client_001', name: 'John Smith', email: 'client@example.com', accountNumber: 'ACC-10001', branchId: 'branch_001', accountType: 'standard' },
-    'business@example.com': { password: 'business123', type: 'client', id: 'client_002', name: 'Tech Corp', email: 'business@example.com', accountNumber: 'ACC-10002', branchId: 'branch_001', accountType: 'business' }
-  };
-
-  const branchReferralCodes = {
-    'MAIN001-REF': { branchId: 'branch_001', branchName: 'Main Branch', branchCode: 'MAIN-001' },
-    'DT002-REF': { branchId: 'branch_002', branchName: 'Downtown Branch', branchCode: 'DT-002' },
-    'WEST003-REF': { branchId: 'branch_003', branchName: 'West Branch', branchCode: 'WEST-003' }
-  };
-
-  const handleLogin = () => {
+  // Handle login with backend API
+  const handleLogin = async () => {
     setLoginError('');
-    const user = mockUsers[loginForm.email];
-    if (!user) { setLoginError('User not found'); return; }
-    if (user.password !== loginForm.password) { setLoginError('Invalid password'); return; }
-    setCurrentUser(user);
+    setIsLoading(true);
+    
+    try {
+      const response = await apiLogin(loginForm.email, loginForm.password);
+      
+      // Store tokens
+      localStorage.setItem('accessToken', response.access_token);
+      localStorage.setItem('refreshToken', response.refresh_token);
+      
+      // Get user data
+      const userData = response.user || await getCurrentUser();
+      setCurrentUser(userData);
+      
+    } catch (error) {
+      const errorMsg = error.response?.data?.detail || 'Login failed. Please check your credentials.';
+      setLoginError(errorMsg);
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRegister = () => {
-    if (registerForm.password !== registerForm.confirmPassword) { alert('Passwords do not match!'); return; }
-    if (!registerForm.referralCode) { alert('Branch referral code is required!'); return; }
-    const branchInfo = branchReferralCodes[registerForm.referralCode];
-    if (!branchInfo) { alert('Invalid referral code!'); return; }
+  // Handle registration with backend API
+  const handleRegister = async () => {
+    setRegisterError('');
     
-    alert(`✅ Account Created!\n\nName: ${registerForm.name}\nEmail: ${registerForm.email}\nAccount: ACC-${Math.floor(10000 + Math.random() * 90000)}\nBranch: ${branchInfo.branchName}`);
-    setRegisterForm({ name: '', email: '', password: '', confirmPassword: '', referralCode: '', phone: '' });
-    setShowRegister(false);
+    // Validate passwords match
+    if (registerForm.password !== registerForm.confirmPassword) {
+      setRegisterError('Passwords do not match!');
+      return;
+    }
+    
+    // Validate referral code is provided
+    if (!registerForm.referralCode) {
+      setRegisterError('Branch referral code is required!');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const userData = {
+        name: registerForm.name,
+        email: registerForm.email,
+        password: registerForm.password,
+        phone: registerForm.phone || null,
+        referralCode: registerForm.referralCode,
+        accountType: registerForm.accountType === 'individual' ? 'standard' : 'business'
+      };
+      
+      await apiRegister(userData);
+      
+      // Show success message
+      alert(`✅ Account Created Successfully!\n\nName: ${registerForm.name}\nEmail: ${registerForm.email}\n\nYou can now login with your credentials.`);
+      
+      // Reset form and switch to login
+      setRegisterForm({ 
+        name: '', 
+        email: '', 
+        password: '', 
+        confirmPassword: '', 
+        referralCode: '', 
+        phone: '', 
+        accountMode: 'demo',
+        accountType: 'individual' 
+      });
+      setShowRegister(false);
+      
+    } catch (error) {
+      const errorMsg = error.response?.data?.detail || 'Registration failed. Please try again.';
+      setRegisterError(errorMsg);
+      console.error('Registration error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (currentUser) {
