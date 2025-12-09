@@ -4,7 +4,7 @@ from datetime import datetime
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.database import get_db
-from app.schemas.user import UserCreate, UserLogin, UserResponse, Token
+from app.schemas.user import UserCreate, UserLogin, UserResponse, Token, RefreshTokenRequest
 from app.models.user import User, UserRole
 from app.models.branch import Branch
 from app.models.account import Account
@@ -14,7 +14,9 @@ from app.utils.security import (
     get_password_hash,
     create_access_token,
     create_refresh_token,
-    generate_account_number
+    generate_account_number,
+    decode_token,
+    validate_password_strength
 )
 from app.utils.logging import log_security_event, get_logger
 
@@ -27,6 +29,14 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 @limiter.limit("5/hour")  # Limit to 5 registration attempts per hour
 async def register(request: Request, user_data: UserCreate, db: Session = Depends(get_db)):
     """Register a new user (client). Rate limited to 5 attempts per hour."""
+
+    # Validate password strength
+    is_valid, error_msg = validate_password_strength(user_data.password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_msg
+        )
 
     # Check if email already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
@@ -169,7 +179,8 @@ async def login(request: Request, credentials: UserLogin, db: Session = Depends(
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
+            "user": user
         }
 
     except HTTPException:
@@ -183,6 +194,70 @@ async def login(request: Request, credentials: UserLogin, db: Session = Depends(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed. Please try again later."
+        )
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_access_token(
+    refresh_token_data: RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
+    """Refresh access token using refresh token."""
+    try:
+        # Decode refresh token
+        payload = decode_token(refresh_token_data.refresh_token)
+        
+        if payload is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token"
+            )
+        
+        # Verify it's a refresh token
+        if payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token type"
+            )
+        
+        user_id = payload.get("user_id")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload"
+            )
+        
+        # Get user from database
+        user = db.query(User).filter(User.id == user_id).first()
+        
+        if not user or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found or inactive"
+            )
+        
+        # Create new access token
+        new_access_token = create_access_token(data={
+            "user_id": user.id,
+            "email": user.email,
+            "role": user.role
+        })
+        
+        logger.info(f"Token refreshed for user: {user.email}")
+        
+        return {
+            "access_token": new_access_token,
+            "refresh_token": refresh_token_data.refresh_token,  # Keep same refresh token
+            "token_type": "bearer"
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Token refresh failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Token refresh failed"
         )
 
 
