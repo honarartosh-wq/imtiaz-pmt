@@ -8,6 +8,12 @@ import { X } from 'lucide-react';
  * Optimized with React.memo and useMemo
  */
 export const PositionsList = React.memo(function PositionsList({ positions, onClosePosition }) {
+  // Memoize total P/L calculation for performance
+  const totalPL = useMemo(() => {
+    if (!positions || positions.length === 0) return 0;
+    return positions.reduce((sum, p) => sum + p.profit, 0);
+  }, [positions]);
+
   if (!positions || positions.length === 0) {
     return (
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
