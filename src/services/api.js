@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// API base URL - defaults to localhost:8000 for development
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// API base URL - Use relative URL for preview/production, localhost for development
+// In preview environment, requests will automatically go to the same domain
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Create axios instance with default config
 const api = axios.create({
