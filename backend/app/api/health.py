@@ -69,7 +69,8 @@ async def detailed_health_check(db: Session = Depends(get_db)):
 async def readiness_check(db: Session = Depends(get_db)):
     """Kubernetes readiness probe."""
     try:
-        db.execute("SELECT 1")
+        from sqlalchemy import text
+        db.execute(text("SELECT 1"))
         return {"status": "ready"}
     except Exception:
         return {"status": "not_ready"}, status.HTTP_503_SERVICE_UNAVAILABLE
