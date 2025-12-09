@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TrendingUp, Copy, CheckCircle, DollarSign, Activity, BarChart3, Clock, Download, Upload, Eye, EyeOff, Plus, X, AlertTriangle, Server, Globe, FileText, Key } from 'lucide-react';
+import { login as apiLogin, register as apiRegister, getCurrentUser } from './services/api';
 
 // ==================== CONSTANTS ====================
 const TRADING_SYMBOLS = ['EURUSD', 'GBPUSD', 'USDJPY', 'XAUUSD', 'BTCUSD'];
