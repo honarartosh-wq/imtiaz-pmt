@@ -1,0 +1,17 @@
+# Nixpacks configuration for Railway deployment
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm-9_x"]
+
+[phases.install]
+cmds = [
+  "npm cache clean --force",
+  "npm ci --prefer-offline --no-audit"
+]
+
+[phases.build]
+cmds = ["npm run build:prod"]
+
+[start]
+cmd = "npx serve dist -l $PORT"
