@@ -227,13 +227,35 @@ const ImtiazTradingPlatform = () => {
                 </div>
               </div>
 
-              <input type="password" placeholder="Password" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white" value={registerForm.password} onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })} />
-              <input type="password" placeholder="Confirm Password" className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white" value={registerForm.confirmPassword} onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })} />
-              <button onClick={handleRegister} className="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-lg font-semibold">Create Account</button>
+              <input 
+                type="password" 
+                placeholder="Password (min 12 chars, uppercase, lowercase, number, special char)" 
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm" 
+                value={registerForm.password} 
+                onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                disabled={isLoading}
+              />
+              <input 
+                type="password" 
+                placeholder="Confirm Password" 
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white" 
+                value={registerForm.confirmPassword} 
+                onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                disabled={isLoading}
+              />
+              {registerError && <div className="bg-red-600/10 border border-red-600/30 rounded-lg p-3 text-red-400 text-sm">{registerError}</div>}
+              <button 
+                onClick={handleRegister} 
+                className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-600 disabled:cursor-not-allowed py-3 rounded-lg font-semibold"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </button>
               <div className="bg-purple-600/10 border border-purple-600/30 rounded-lg p-4 text-xs text-slate-300">
-                <div className="font-semibold mb-1">Available Branch Codes:</div>
+                <div className="font-semibold mb-2">📋 Available Branch Codes:</div>
                 <div><strong>MAIN001-REF</strong> - Main Branch</div>
                 <div><strong>DT002-REF</strong> - Downtown Branch</div>
+                <div className="mt-2 text-slate-400">Get your referral code from your branch admin.</div>
               </div>
             </div>
           ) : (
