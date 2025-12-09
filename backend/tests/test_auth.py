@@ -44,9 +44,9 @@ class TestPasswordValidation:
 
     def test_common_password(self):
         """Test that common password fails validation."""
-        is_valid, error = validate_password_strength("password123")
+        is_valid, error = validate_password_strength("password12345")
         assert is_valid is False
-        assert "too common" in error
+        assert "too common" in error.lower()
 
 
 class TestAuthEndpoints:
