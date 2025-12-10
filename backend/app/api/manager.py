@@ -193,3 +193,74 @@ async def update_branch_commission(
     db.refresh(branch)
 
     return branch
+
+
+# ==================== User Management Endpoints ====================
+
+@router.get("/admins")
+async def get_all_admins(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_manager)
+):
+    """Get all admin users (manager only)."""
+    from app.models.user import UserRole
+    
+    admins = db.query(User).filter(User.role == UserRole.ADMIN).all()
+    
+    result = []
+    for admin in admins:
+        branch_name = None
+        if admin.branch_id:
+            branch = db.query(Branch).filter(Branch.id == admin.branch_id).first()
+            if branch:
+                branch_name = branch.name
+        
+        result.append({
+            "id": admin.id,
+            "name": admin.name,
+            "email": admin.email,
+            "branch_id": admin.branch_id,
+            "branch_name": branch_name,
+            "admin_balance": float(admin.admin_balance or 0),
+            "is_active": admin.is_active,
+            "created_at": admin.created_at
+        })
+    
+    return result
+
+
+@router.get("/clients")
+async def get_all_clients(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_manager)
+):
+    """Get all client users with their accounts (manager only)."""
+    from app.models.user import UserRole
+    from app.models.account import Account
+    
+    clients = db.query(User).filter(User.role == UserRole.CLIENT).all()
+    
+    result = []
+    for client in clients:
+        account = db.query(Account).filter(Account.user_id == client.id).first()
+        branch_name = None
+        if client.branch_id:
+            branch = db.query(Branch).filter(Branch.id == client.branch_id).first()
+            if branch:
+                branch_name = branch.name
+        
+        result.append({
+            "id": client.id,
+            "name": client.name,
+            "email": client.email,
+            "account_number": client.account_number,
+            "branch_id": client.branch_id,
+            "branch_name": branch_name,
+            "balance": float(account.balance if account else 0),
+            "wallet_balance": float(account.wallet_balance if account else 0),
+            "trading_balance": float(account.trading_balance if account else 0),
+            "is_active": client.is_active,
+            "created_at": client.created_at
+        })
+    
+    return result
