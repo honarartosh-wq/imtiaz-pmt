@@ -229,14 +229,46 @@ function ClientDashboard({ user, branch, onLogout }) {
         )}
 
         {activeTab === 'wallet' && (
-          <div className="bg-slate-800 rounded-xl p-8 border border-slate-700 text-center">
-            <Wallet size={48} className="mx-auto text-purple-400 mb-4" />
-            <h3 className="text-xl font-bold mb-2">Wallet Management</h3>
-            <p className="text-slate-400 mb-4">Deposit and withdrawal features coming soon</p>
-            <div className="text-3xl font-bold text-emerald-400 mb-2">
-              ${accountData.balance.toLocaleString()}
+          <div className="space-y-6">
+            {/* Balance Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+                <div className="text-sm text-gray-400 mb-2">Total Balance</div>
+                <div className="text-3xl font-bold text-white">
+                  ${accountData.balance.toLocaleString()}
+                </div>
+              </div>
+              <div className="bg-slate-800 rounded-lg p-6 border border-emerald-900/30">
+                <div className="text-sm text-gray-400 mb-2">Wallet Balance</div>
+                <div className="text-3xl font-bold text-emerald-400">
+                  ${accountData.wallet_balance.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Available for withdrawal</div>
+              </div>
+              <div className="bg-slate-800 rounded-lg p-6 border border-blue-900/30">
+                <div className="text-sm text-gray-400 mb-2">Trading Balance</div>
+                <div className="text-3xl font-bold text-blue-400">
+                  ${accountData.trading_balance.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Active in trading</div>
+              </div>
             </div>
-            <p className="text-slate-500 text-sm">Current Balance</p>
+
+            {/* Transaction Request Form */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TransactionRequestForm onSuccess={handleTransactionSuccess} />
+              <ProfitTransferCard
+                tradingBalance={accountData.trading_balance}
+                walletBalance={accountData.wallet_balance}
+                onSuccess={handleTransactionSuccess}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'requests' && (
+          <div>
+            <MyRequests />
           </div>
         )}
 
