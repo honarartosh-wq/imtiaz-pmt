@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { LogOut, Wallet, TrendingUp, History, BarChart3 } from 'lucide-react';
+import { LogOut, Wallet, TrendingUp, History, BarChart3, Send } from 'lucide-react';
 import { AccountOverview } from './AccountOverview';
 import { MarketPrices } from './MarketPrices';
 import { PositionsList } from './PositionsList';
 import { Button } from '../shared/Button';
+import TransactionRequestForm from './TransactionRequestForm';
+import ProfitTransferCard from './ProfitTransferCard';
+import MyRequests from './MyRequests';
+import TransactionHistory from '../shared/TransactionHistory';
+import { api } from '../../services/api';
 
 /**
  * Client Dashboard Component - Full Implementation
