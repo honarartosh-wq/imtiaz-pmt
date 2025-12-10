@@ -137,9 +137,39 @@ function ClientDashboard({ user, branch, onLogout }) {
     }
   };
 
+  // Fetch account data
+  useEffect(() => {
+    const fetchAccountData = async () => {
+      try {
+        const response = await api.get('/api/accounts/me');
+        const account = response.data;
+        setAccountData({
+          balance: parseFloat(account.balance || 0),
+          wallet_balance: parseFloat(account.wallet_balance || 0),
+          trading_balance: parseFloat(account.trading_balance || 0),
+          equity: parseFloat(account.balance || 0),
+          freeMargin: parseFloat(account.balance || 0),
+          marginLevel: 100,
+          unrealizedPL: 0,
+        });
+      } catch (error) {
+        console.error('Failed to fetch account:', error);
+      } finally {
+        setLoadingAccount(false);
+      }
+    };
+    fetchAccountData();
+  }, []);
+
+  const handleTransactionSuccess = () => {
+    // Refresh account data after transaction
+    window.location.reload();
+  };
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'wallet', label: 'Wallet', icon: Wallet },
+    { id: 'requests', label: 'Requests', icon: Send },
     { id: 'positions', label: 'Positions', icon: TrendingUp },
     { id: 'history', label: 'History', icon: History },
   ];
