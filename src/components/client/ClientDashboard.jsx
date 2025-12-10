@@ -279,10 +279,8 @@ function ClientDashboard({ user, branch, onLogout }) {
         )}
 
         {activeTab === 'history' && (
-          <div className="bg-slate-800 rounded-xl p-8 border border-slate-700 text-center">
-            <History size={48} className="mx-auto text-purple-400 mb-4" />
-            <h3 className="text-xl font-bold mb-2">Transaction History</h3>
-            <p className="text-slate-400">Trade history and reports coming soon</p>
+          <div>
+            <TransactionHistory limit={50} />
           </div>
         )}
       </div>
