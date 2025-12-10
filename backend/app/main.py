@@ -5,7 +5,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
 from app.database import Base, engine
-from app.api import auth, manager, health, transactions, accounts
+from app.api import auth, manager, health, transactions, accounts, admin
 from app.utils.logging import setup_logging, get_logger
 # Import other routers as we create them
 # from app.api import trades
