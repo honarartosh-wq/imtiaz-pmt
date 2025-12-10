@@ -62,7 +62,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(manager.router, prefix="/api")
 app.include_router(health.router, prefix="/api")
 app.include_router(transactions.router, prefix="/api")
-# app.include_router(accounts.router, prefix="/api")
+app.include_router(accounts.router, prefix="/api")
 # app.include_router(trades.router, prefix="/api")
 
 
