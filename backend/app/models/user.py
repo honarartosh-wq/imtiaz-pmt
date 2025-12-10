@@ -34,6 +34,9 @@ class User(Base):
     branch_id = Column(Integer, ForeignKey("branches.id"), nullable=True)
     branch = relationship("Branch", back_populates="users")
 
+    # Admin balance (for admin users only)
+    admin_balance = Column(Numeric(precision=15, scale=2), default=0.0, nullable=True)
+
     # Referral code used during registration
     referral_code = Column(String, nullable=True)
 
