@@ -5,10 +5,10 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
 from app.database import Base, engine
-from app.api import auth, manager, health
+from app.api import auth, manager, health, transactions
 from app.utils.logging import setup_logging, get_logger
 # Import other routers as we create them
-# from app.api import accounts, transactions, trades
+# from app.api import accounts, trades
 
 # Setup logging
 setup_logging(log_level="INFO" if not settings.DEBUG else "DEBUG")
