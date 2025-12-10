@@ -21,12 +21,15 @@ function ClientDashboard({ user, branch, onLogout }) {
 
   // Account data state
   const [accountData, setAccountData] = useState({
-    balance: 50000,
-    equity: 52500,
-    freeMargin: 47500,
-    marginLevel: 1050,
-    unrealizedPL: 2500,
+    balance: 0,
+    wallet_balance: 0,
+    trading_balance: 0,
+    equity: 0,
+    freeMargin: 0,
+    marginLevel: 0,
+    unrealizedPL: 0,
   });
+  const [loadingAccount, setLoadingAccount] = useState(true);
 
   // Market prices state
   const [marketPrices, setMarketPrices] = useState({
