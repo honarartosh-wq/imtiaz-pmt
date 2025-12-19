@@ -9,7 +9,7 @@ import TransactionRequestForm from './TransactionRequestForm';
 import ProfitTransferCard from './ProfitTransferCard';
 import MyRequests from './MyRequests';
 import TransactionHistory from '../shared/TransactionHistory';
-import { api } from '../../services/api';
+import api from '../../services/api';
 
 /**
  * Client Dashboard Component - Full Implementation
