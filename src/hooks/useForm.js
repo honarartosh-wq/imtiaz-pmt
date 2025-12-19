@@ -18,10 +18,13 @@ export const useForm = (initialValues, onSubmit) => {
       [name]: type === 'checkbox' ? checked : value
     }));
     // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
-    }
-  }, [errors]);
+    setErrors(prev => {
+      if (prev[name]) {
+        return { ...prev, [name]: null };
+      }
+      return prev;
+    });
+  }, []);
 
   const handleSubmit = useCallback(async (e) => {
     if (e) e.preventDefault();
